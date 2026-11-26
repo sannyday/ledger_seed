@@ -66,8 +66,17 @@ sudo usermod -aG plugdev "$USER"   # then log out / log in
 
 ```bash
 make           # cc -O2 -Wall -Wextra -o ledger_seed ledger_seed.c
-make static    # fully static musl binary (needs musl-gcc, e.g. from nixpkgs)
+make static    # fully static binary (portable across Linux x86-64)
+
+# static toolchain, nix:
+nix-shell -p pkgsStatic.stdenv.cc --run 'make static'
+nix-shell -p glibc.static --run 'make static'
+# static toolchain, fedora:
+sudo dnf install musl-gcc musl-devel && make static
 ```
+
+(`nix-shell -p musl` alone does not work: its `musl-gcc` wrapper wants
+`libatomic_asneeded`, which that shell doesn't provide.)
 
 ## Checking that a passphrase change alters the output
 
