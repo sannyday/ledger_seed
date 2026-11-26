@@ -70,7 +70,7 @@ make dynamic        # dynamic glibc build - local experiments only, NOT the test
 make clean
 ```
 
-\`make\` needs a **static toolchain** and fails loudly with instructions if
+`make` needs a **static toolchain** and fails loudly with instructions if
 none is available:
 
 ```bash
