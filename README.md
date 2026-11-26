@@ -17,7 +17,7 @@ deterministic **seed** strings derived on a Ledger Nano through the
 ## Usage
 
 ```bash
-make                         # build ./ledger_seed (needs only a C compiler)
+make                         # build ./ledger_seed (STATIC - the tested artifact)
 ./ledger_seed                # keys for 2020 .. current year
 ./ledger_seed 2030           # keys for 2020 .. 2030
 ./ledger_seed --debug 2030   # same, plus app/path/driver diagnostic lines
@@ -65,18 +65,19 @@ sudo usermod -aG plugdev "$USER"   # then log out / log in
 ## Build
 
 ```bash
-make           # cc -O2 -Wall -Wextra -o ledger_seed ledger_seed.c
-make static    # fully static binary (portable across Linux x86-64)
-
-# static toolchain, nix:
-nix-shell -p pkgsStatic.stdenv.cc --run 'make static'
-nix-shell -p glibc.static --run 'make static'
-# static toolchain, fedora:
-sudo dnf install musl-gcc musl-devel && make static
+make                # DEFAULT: fully static ledger_seed (the tested/released artifact)
+make dynamic        # dynamic glibc build - local experiments only, NOT the tested artifact
+make clean
 ```
 
-(`nix-shell -p musl` alone does not work: its `musl-gcc` wrapper wants
-`libatomic_asneeded`, which that shell doesn't provide.)
+\`make\` needs a **static toolchain** and fails loudly with instructions if
+none is available:
+
+```bash
+nix-shell -p glibc.static --run 'make'        # nix, glibc static
+nix-shell -p pkgsStatic.stdenv.cc --run 'make' # nix, fully static stdenv
+sudo dnf install glibc-static && make          # fedora
+```
 
 ## Checking that a passphrase change alters the output
 
@@ -104,7 +105,7 @@ Secret backup: 24 words + passphrase - nothing else is secret.
 | File | Purpose |
 |---|---|
 | `ledger_seed.c` | the whole tool (built-in SHA-256 + hidraw transport) |
-| `Makefile` | build rules (`make`, `make static`, `make clean`) |
+| `Makefile` | build rules (static by default: `make`; `make dynamic`; `make clean`) |
 
 ## Notes
 
